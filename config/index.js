@@ -51,6 +51,7 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+    cdnPath: 'http://127.0.0.1:8080/',
 
     /**
      * Source Maps

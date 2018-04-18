@@ -10,6 +10,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const PrerenderSPAPlugin = require('prerender-spa-plugin')
+const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 
 const env = require('../config/prod.env')
 
@@ -115,7 +117,30 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+
+    // prereder page
+    new PrerenderSPAPlugin({
+      staticDir: config.build.assetsRoot,
+      routes: [ '/', '/about', '/contact' ],
+      postProcess (renderedRoute) {
+        // add CDN
+        renderedRoute.html = renderedRoute.html.replace(
+          /(<script[^<>]*src=\")((?!http|https)[^<>\"]*)(\"[^<>]*>[^<>]*<\/script>)/ig,
+         `$1${config.build.cdnPath}$2$3`
+        ).replace(
+          /(<link[^<>]*href=\")((?!http|https)[^<>\"]*)(\"[^<>]*>)/ig,
+         `$1${config.build.cdnPath}$2$3`
+        )
+
+        return renderedRoute
+      },
+
+      renderer: new Renderer({
+        injectProperty: '__PRERENDER_INJECTED__',
+        inject: 'prerender'
+      })
+    })
   ]
 })
 

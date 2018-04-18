@@ -13,6 +13,7 @@ const createLintingRule = () => ({
   loader: 'eslint-loader',
   enforce: 'pre',
   include: [resolve('src'), resolve('test')],
+  exclude: [resolve('src/public-path')],
   options: {
     formatter: require('eslint-friendly-formatter'),
     emitWarning: !config.dev.showEslintErrorsInOverlay
